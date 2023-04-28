@@ -1,0 +1,1 @@
+colist <- function(x) { t(t(colnames(x))) }
