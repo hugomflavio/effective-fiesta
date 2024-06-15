@@ -242,6 +242,12 @@ continue_battle <- function(previous_battle, attacker, trials = 500000, promoted
 
 	output$defender_outcome <- defender_outcome
 
+	if (any(defender_outcome$defender_hp_left == 0)) {
+		message("Likely win prob: ", round(defender_outcome$Prob[1], 2), "%")
+	} else {
+		message("Likely win prob: 0%")		
+	}
+
 	return(output)
 }
 
@@ -272,3 +278,94 @@ tech_cost(tech = "democracy")
 # 	cost2 <- 0.5 * (n_req * 2)^1.5 * start_cost
 # 	return(c(cost1, cost2))
 # }
+
+incite <- function(size, distance, gold, unit_prod = 0, 
+				   improvement_prod = 0, courthouse = FALSE, 
+				   happy = 0, unhappy = 0, angry = 0, 
+				   nationals = 0, foreigns = 0,
+				   celebrating = FALSE, 
+				   takeback = FALSE, conquered = FALSE,
+				   unit_factor = 2, improvement_factor = 1,
+				   total_factor = 100, base_factor = 1000) {
+
+	# city owner gold effect
+	cost <- gold + base_factor
+
+	# effect of units' prod-equivalent
+	cost <- cost + unit_prod * unit_factor
+
+	# effect of buildings' prod-equivalent
+	cost <- cost + improvement_prod * improvement_factor
+
+	# stability
+	if (unhappy == 0) {
+		cost <- cost * 2
+	}
+	if (celebrating) {
+		cost <- cost * 2
+	}
+
+	# Buy back is cheap, bribing conquered cities are also cheaper
+	if (takeback) {
+		cost <- cost / 2 # buy back: 50% price reduction
+	} else if (conquered) {
+		cost <- cost * 2 / 3 # buy conquered: 33% price reduction
+	}
+
+	# Distance from capital
+	# Max penalty is 32. Applied if there is no capital, or it's even further away.
+	distance <- min(distance, 32)
+
+	corrected_size <- max(1, size + happy - unhappy - (angry * 3))
+
+	cost <- cost * corrected_size * total_factor
+	cost <- cost / (distance + 3)
+
+	cost_per_citizen <- cost / size;
+	natives <- size - nationals - foreigns;
+	cost <- cost_per_citizen * (natives + 0.7 * foreigns + 0.5 * nationals);
+	
+	# cost <- cost + (cost * get_city_bonus(pcity, EFT_INCITE_COST_PCT)) / 100;
+
+	# EFFECTS
+
+	# courthouse effect
+	if (courthouse) {
+		if (unit_prod > 0) {
+			cost <- cost + cost * 3
+		} else {
+			cost <- cost + cost * 1
+		}
+	}
+	if (unit_prod == 0) {
+		cost <- cost + cost * -0.5
+	}
+
+	# wrap up
+	cost <- cost / 100
+	if (cost >= (1000 * 1000 * 1000)) {
+		message("Too expensive, inciting not possible")
+	} else {
+		return(cost)
+	}
+}
+
+
+wp <- function(v0 = 0, 
+			   v1 = 0, v2 = 0, v3 = 0, 
+			   h1 = 0, h2 = 0, h3 = 0, 
+			   e1 = 0, e2 = 0, e3 = 0, e4 = 0) {
+    # floor(10 * 1.75 / 100 * (3*9) / move_frags)
+	output <- v0 * floor(10 * 100 / 100 * (3*9) / 9) +
+			  v1 * floor(10 * 150 / 100 * (3*9) / 9) +
+			  v2 * floor(10 * 175 / 100 * (3*9) / 9) +
+			  v3 * floor(10 * 200 / 100 * (3*9) / 9) +
+			  h1 * floor(10 * 225 / 100 * (3*9) / 9) +
+			  h2 * floor(10 * 250 / 100 * (3*9) / 9) +
+			  h3 * floor(10 * 275 / 100 * (3*9) / 9) +
+			  e1 * floor(10 * 300 / 100 * (3*9) / 9) +
+			  e2 * floor(10 * 325 / 100 * (3*9) / 9) +
+			  e3 * floor(10 * 350 / 100 * (3*9) / 9) +
+			  e4 * floor(10 * 375 / 100 * (3*9) / 9)
+	return(output/10)
+}

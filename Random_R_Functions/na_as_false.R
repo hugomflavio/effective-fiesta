@@ -1,4 +1,4 @@
-na.as.false <- function(x){
+na_as_false <- function(x){
   x[is.na(x)] <- FALSE
   return(x)
 }
