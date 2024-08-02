@@ -17,8 +17,8 @@ mean_table <- function(x, by, ci = c("none", "sd", "sem"),
 
 	if (ci == "sem") {
 		output$sem <- as.vector(aggregate(x, by, sem, na.rm = na.rm)$x)
-		output$upper <- round(utput$mean + output$sem, digits)
-		output$lower <- round(utput$mean - output$sem, digits)
+		output$upper <- round(output$mean + output$sem, digits)
+		output$lower <- round(output$mean - output$sem, digits)
 		output$sem <- round(output$sem, digits)
 	}
 
