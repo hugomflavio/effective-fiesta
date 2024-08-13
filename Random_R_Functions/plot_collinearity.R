@@ -1,6 +1,8 @@
 plot_collinearity <- function(input) {
   continuous <- sapply(input, class) %in% c("integer", "numeric")
   factors <- sapply(input, class) %in% c("factor", "logical")
+  skipped1 <- FALSE
+  skipped2 <- FALSE
   if (sum(continuous) > 1) {
     panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
     {
@@ -15,9 +17,11 @@ plot_collinearity <- function(input) {
     dev.new()
   } else { 
   	if (sum(continuous) == 1) {
+      skipped1 <- TRUE
       message("M: Only one continuous variable found, skipping continuous colinearity comparisons.")
     }
     if (sum(continuous) == 0) {
+      skipped1 <- TRUE
       message("M: No continuous variable found, skipping continuous colinearity comparisons.")
     }
   }
@@ -38,7 +42,11 @@ plot_collinearity <- function(input) {
     p + labs(x = "")
   } else {
     if(sum(continuous) == 0) {
+      skipped2 <- TRUE
       message("M: No continuous variable found, skipping factor colinearity comparisons.")
     }
+  }
+  if (skipped1 & skipped2) {
+    message("M: No plots to draw.")
   }
 }
