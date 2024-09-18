@@ -1,6 +1,6 @@
 plot_collinearity <- function(input) {
   continuous <- sapply(input, class) %in% c("integer", "numeric")
-  factors <- sapply(input, class) %in% c("factor", "logical")
+  factors <- sapply(input, class) %in% c("factor", "character", "logical")
   skipped1 <- FALSE
   skipped2 <- FALSE
   if (sum(continuous) > 1) {
