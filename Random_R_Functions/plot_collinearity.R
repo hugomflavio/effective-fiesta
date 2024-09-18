@@ -14,7 +14,6 @@ plot_collinearity <- function(input) {
         text(0.5, 0.5, txt, cex = cex.cor * r)
     }
     pairs(input[, continuous], pch = 20, lower.panel = panel.cor)
-    dev.new()
   } else { 
   	if (sum(continuous) == 1) {
       skipped1 <- TRUE
@@ -26,6 +25,9 @@ plot_collinearity <- function(input) {
     }
   }
   if (sum(continuous) > 0) {
+    if (!skipped1) {
+      dev.new()
+    }
     aux <- reshape2::melt(input, 
       id.vars = colnames(input)[factors], 
       meas.vars = colnames(input)[continuous])
