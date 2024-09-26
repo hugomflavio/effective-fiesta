@@ -42,6 +42,7 @@ plot_collinearity <- function(input) {
     p <- p + geom_point(position = position_jitter(width = 0.2, height = 0), alpha = 0.2)
     p <- p + facet_grid(continuous ~ variable, scales = "free")
     p + labs(x = "")
+    print(p)
   } else {
     if(sum(continuous) == 0) {
       skipped2 <- TRUE
