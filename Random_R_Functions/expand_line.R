@@ -12,18 +12,19 @@ expand_line <- function(x1, x2, y1, drop = 0, y2 = y1){
 
 
 geom_signif <- function(p, x1, x2, y1, drop = 0, y2 = y1, 
-						label_raise = 0, label = "*") {
+						label_raise = 0, label = "*", colour = "black",
+						text_colour = "black") {
 	
 	the_line <- expand_line(x1 = x1, x2 = x2, 
 							y1 = y1, y2 = y2,
 							drop = drop)
 
 	p <- p + ggplot2::geom_line(data = the_line, 
-								ggplot2::aes(x = x, y = y))
+								ggplot2::aes(x = x, y = y), colour = colour)
 	p <- p + ggplot2::annotate("text",
 							   x = mean(the_line$x), 
 							   y = mean(c(y1, y2)) + label_raise, 
-							   label = label,
+							   label = label, colour = text_colour,
 							   hjust = 0.5, vjust = 0)
 	return(p)
 }
