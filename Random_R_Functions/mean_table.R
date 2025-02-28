@@ -1,4 +1,4 @@
-mean_table <- function(x, by, ci = c("none", "sd", "sem"),
+mean_table <- function(x, by, ci = c("none", "sd", "sem", "95"),
 					   na.rm = FALSE, digits = Inf) {
 	sem <- function(x, na.rm) {sd(x, na.rm = na.rm) / sqrt(length(x))}
 	ci <- match.arg(ci)
@@ -20,6 +20,11 @@ mean_table <- function(x, by, ci = c("none", "sd", "sem"),
 		output$upper <- round(output$mean + output$sem, digits)
 		output$lower <- round(output$mean - output$sem, digits)
 		output$sem <- round(output$sem, digits)
+	}
+
+	if (ci == "95") {
+		output$upper <- round(as.vector(aggregate(x, by, quantile, 0.975)$x), digits)
+		output$lower <- round(as.vector(aggregate(x, by, quantile, 0.025)$x), digits)
 	}
 
 	output$mean <- round(output$mean, digits)
