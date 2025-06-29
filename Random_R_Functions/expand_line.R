@@ -13,7 +13,7 @@ expand_line <- function(x1, x2, y1, drop = 0, y2 = y1){
 
 geom_signif <- function(p, x1, x2, y1, drop = 0, y2 = y1, 
 						label_raise = 0, label = "*", colour = "black",
-						text_colour = "black") {
+						text_colour = "black", label_size = 11) {
 	
 	the_line <- expand_line(x1 = x1, x2 = x2, 
 							y1 = y1, y2 = y2,
@@ -25,6 +25,7 @@ geom_signif <- function(p, x1, x2, y1, drop = 0, y2 = y1,
 							   x = mean(the_line$x), 
 							   y = mean(c(y1, y2)) + label_raise, 
 							   label = label, colour = text_colour,
-							   hjust = 0.5, vjust = 0)
+							   hjust = 0.5, vjust = 0,
+							   size = label_size/ggplot2::.pt)
 	return(p)
 }
