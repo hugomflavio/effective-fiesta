@@ -1,32 +1,41 @@
-plot_vars <- function(input) {
-  if (!nzchar(system.file(package = "patchwork"))) {
-    stop("This function requires the package patchwork.", call. = FALSE)
+plot_vars <- function(input, y) {
+  if (any(!c("ggplot2", "patchwork") %in% rownames(installed.packages()))) {
+    stop("This function requires packages ggplot2 and patchwork")
   }
-  if (packageVersion("patchwork") < "1.2.0") {
-    stop("This function requires version 1.2.0 or higher of package patchwork.",
-         call. = FALSE)
+  if (!is.data.frame(input)) {
+    warning("Input must be a data.frame. attempting to convert.",
+            immediate. = TRUE, call. = FALSE)
+    input <- as.data.frame(input)
   }
-  if (is.numeric(input[, 1])) {
-    j_height <- 0
+  pd <- input
+  if (missing("y")) {
+    pd$new_index_col_123 <- 1:nrow(pd)
+    y = "row index"
   } else {
-    j_height <- 0.2
+    pd$new_index_col_123 <- pd[, y]
+    pd[, y] <- NULL
   }
-
-  plots <- lapply(2:ncol(input), function(i) {
-    if (is.numeric(input[, i])) {
-      j_width <- (max(input[, i], na.rm = TRUE) - min(input[, i], na.rm = TRUE))*0.01
+  p_list <- lapply(colnames(pd)[-ncol(pd)], function(column) {
+    p <- ggplot2::ggplot(data = pd)
+    p <- p + ggplot2::aes(x = .data[[column]], y = new_index_col_123)
+    if (class(pd[, column]) %in% c("logical", "factor", "character")) {
+      jitter_w <- 0.2
     } else {
-      j_width <- 0.2
+      jitter_w <- 0
     }
-    p <- ggplot2::ggplot(data = input, 
-      ggplot2::aes(y = .data[[colnames(input)[1]]], 
-                   x = .data[[colnames(input)[i]]]))
-    p <- p + ggplot2::geom_point(
-      position = ggplot2::position_jitter(
-        width = j_width, height = j_height), 
-      alpha = 0.2)
-    p
+    if (class(pd$new_index_col_123) %in% c("logical", "factor", "character")) {
+      jitter_h <- 0.2
+    } else {
+      jitter_h <- 0
+    }
+    p <- p + ggplot2::geom_point(position = position_jitter(width = jitter_w,
+                                                            height = jitter_h),
+                                 alpha = 0.2)
+    p <- p + ggplot2::labs(title = column,
+                           x = paste0("(", class(pd[, column]), ")"),
+                           y = y)
+    p + ggplot2::theme_bw()
   })
-
-  patchwork::wrap_plots(plots)
+  
+  return(patchwork::wrap_plots(p_list))
 }
