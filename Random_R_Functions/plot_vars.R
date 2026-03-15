@@ -1,17 +1,32 @@
+#' Plot all variables of a data.frame
+#' 
+#' Requires both ggplot2 and patchwork to work
+#'
+#' @param input a data.frame
+#' @param y optional, a column to use as y axis. If none is provided, the row
+#'          index is used as the y axis.
+#'
+#' @return a grid of ggplots
+#'
 plot_vars <- function(input, y) {
   if (any(!c("ggplot2", "patchwork") %in% rownames(installed.packages()))) {
-    stop("This function requires packages ggplot2 and patchwork")
+    stop("This function requires packages ggplot2 and patchwork.")
   }
   if (!is.data.frame(input)) {
-    warning("Input must be a data.frame. attempting to convert.",
+    warning("Input must be a data.frame. Attempting to convert.",
             immediate. = TRUE, call. = FALSE)
-    input <- as.data.frame(input)
   }
-  pd <- input
+  pd <- as.data.frame(input)
   if (missing("y")) {
     pd$new_index_col_123 <- 1:nrow(pd)
-    y = "row index"
+    y <- "row index"
   } else {
+    if (!y %in% colnames(pd)) {
+      stop("y is not a column name of input")
+    }
+    if (ncol(pd) < 2) {
+      stop("y provided but input only has one column. No x to plot.")
+    }
     pd$new_index_col_123 <- pd[, y]
     pd[, y] <- NULL
   }
